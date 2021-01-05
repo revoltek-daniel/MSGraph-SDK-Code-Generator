@@ -1,3 +1,14 @@
+parameters:
+- name: typeWriterArtifactName
+  type: string
+
+- name: optionalPostCheckoutStep
+  type: stepList
+  default: # TODO is there a way to skip this without a dummy default task?
+  - pwsh: |
+      Write-Host "No optional post-checkout step is provided, this is expected in majority of cases" -ForegroundColor Green
+    displayName: Skip optional post-checkout step
+
 steps:
 - template: use-dotnet-sdk.yml
 
@@ -6,6 +17,8 @@ steps:
   fetchDepth: 1
   submodules: recursive
   persistCredentials: true
+
+- ${{ parameters.optionalPostCheckoutStep }}
 
 - task: DotNetCoreCLI@2
   displayName: 'Build Typewriter'
@@ -24,4 +37,4 @@ steps:
 - task: PublishBuildArtifacts@1
   inputs:
     pathToPublish: '$(Build.ArtifactStagingDirectory)'
-    artifactName: typewriter
+    artifactName: ${{ parameters.typeWriterArtifactName }}

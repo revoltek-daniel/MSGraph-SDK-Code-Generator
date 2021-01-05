@@ -25,11 +25,17 @@ parameters:
   - pwsh: |
       Write-Error "No language specific step is provided"
 
+- name: typeWriterArtifactName
+  type: string
+  default: 'typewriter'
+
 - name: cleanMetadataFile
   type: string
 
 steps:
 - template: set-up-for-generation.yml
+  parameters:
+    typeWriterArtifactName: ${{ parameters.typeWriterArtifactName }}
 
 - checkout: ${{ parameters.repoName }}
   displayName: 'checkout ${{ parameters.repoName }}'

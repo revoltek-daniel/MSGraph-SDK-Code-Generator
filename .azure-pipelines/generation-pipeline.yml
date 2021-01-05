@@ -112,6 +112,16 @@ stages:
   - job: build_and_publish_typewriter
     steps:
     - template: generation-templates/build-and-publish-typewriter.yml
+      parameters:
+        typeWriterArtifactName : 'typewriter'
+    - template: generation-templates/build-and-publish-typewriter.yml
+      parameters:
+        typeWriterArtifactName : 'typewriter-dotnet-v2'
+        optionalPostCheckoutStep:
+        - pwsh: |
+            git fetch
+            git checkout feature/dotnet-v2
+          displayName: 'Switch to feature/dotnet-v2 branch'
 
 # Downloads the latest public beta metadata. If there are changes, we checkin
 # the public metadata into microsoftgraph/msgraph-metadata, and then run the
@@ -179,6 +189,25 @@ stages:
           parameters:
             repoName: msgraph-sdk-dotnet
             dllName: Microsoft.Graph.dll
+    - template: generation-templates/language-generation.yml
+      parameters:
+        language: 'CSharp'
+        version: ''
+        repoName: 'msgraph-sdk-dotnet'
+        branchName: 'v2.0/pipelinebuild/$(Build.BuildId)'
+        cleanMetadataFile: $(cleanMetadataFileV1)
+        typeWriterArtifactName: 'typewriter-dotnet-v2'
+        languageSpecificSteps:
+        - template: generation-templates/dotnet.yml
+          parameters:
+            repoName: msgraph-sdk-dotnet
+            dllName: Microsoft.Graph.dll
+        optionalPostCheckoutStep:
+          - pwsh: |
+              git fetch
+              git checkout feature/2.0
+            displayName: 'Switch to feature/2.0 branch'
+            workingDirectory: '$(Build.SourcesDirectory)/msgraph-sdk-dotnet'   
 
 - stage: stage_csharp_beta
   dependsOn:

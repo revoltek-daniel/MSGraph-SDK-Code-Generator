@@ -1,7 +1,11 @@
+parameters:
+- name: typeWriterArtifactName
+  type: string
+
 steps:
 - task: DownloadBuildArtifacts@0
   inputs:
     buildType: 'current'
     downloadType: 'single'
-    artifactName: 'typewriter'
+    artifactName: ${{ parameters.typeWriterArtifactName }}
     downloadPath: '$(Build.SourcesDirectory)'
